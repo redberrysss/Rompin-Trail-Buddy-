@@ -287,3 +287,4 @@ All progress is persisted using **SwiftData** with automatic badge calculation.
 ## License
 
 Educational project for nature therapy and inclusive education.
+# Rompin-Trail-Buddy-
