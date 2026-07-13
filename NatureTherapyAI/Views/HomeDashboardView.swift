@@ -6,8 +6,10 @@ struct HomeDashboardView: View {
     let participantName: String
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(AuthenticationViewModel.self) private var authVM
     @State private var viewModel = HomeDashboardViewModel()
     @State private var showSettings = false
+    @State private var showAccount = false
     @State private var showFacilitatorMode = false
     @State private var navigateToActivity: ActivityType?
 
@@ -70,7 +72,19 @@ struct HomeDashboardView: View {
             .navigationTitle("Rompin Forest Explorer")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
+                    syncStatusIndicator
+                }
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button {
+                        showAccount = true
+                    } label: {
+                        Image(systemName: "person.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityLabel("Akaun")
+
                     Button {
                         showSettings = true
                     } label: {
@@ -84,6 +98,9 @@ struct HomeDashboardView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
+            .sheet(isPresented: $showAccount) {
+                AccountView()
+            }
             .sheet(isPresented: $showFacilitatorMode) {
                 FacilitatorModePlaceholder()
             }
@@ -93,6 +110,19 @@ struct HomeDashboardView: View {
             .task {
                 viewModel.loadProgress(for: participantID, context: modelContext)
             }
+        }
+    }
+
+    // MARK: - Sync Status
+
+    private var syncStatusIndicator: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(Color.green)
+                .frame(width: 8, height: 8)
+            Text("Disimpan")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -234,10 +264,16 @@ struct HomeDashboardView: View {
                 statusLabel(for: status)
 
                 if status == .inProgress {
-                    ProgressView(value: viewModel.progress(for: activity))
-                        .tint(.blue)
-                        .frame(height: 6)
-                        .clipShape(Capsule())
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color(.systemGray5))
+                            Capsule()
+                                .fill(Color.blue)
+                                .frame(width: geo.size.width * viewModel.progress(for: activity))
+                        }
+                    }
+                    .frame(height: 6)
                 }
             }
             .padding(14)
