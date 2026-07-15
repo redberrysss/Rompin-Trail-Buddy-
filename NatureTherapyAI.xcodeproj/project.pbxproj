@@ -58,6 +58,16 @@
 		86140CB8076C5AE4F8B4ABAD /* Views/HomeDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE86E2309B9C8E3868C5625 /* Views/HomeDashboardView.swift */; };
 		87286B1AB3EF13B2D3A06E4B /* Views/Auth/AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40746509AF54BFD56E3DAFD /* Views/Auth/AccountView.swift */; };
 		B0CD19AF110C09E20C515930 /* Views/Auth/RoleSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1EB4534C48049861E4ECAA /* Views/Auth/RoleSelectionView.swift */; };
+		5B134928CB03BCCBFD34B2AC /* Views/MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D65E29C77FFCD9F7EA38483; };
+		FE66607BED926E49B7A9304C /* Views/StudentHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F7C2957EDDB04AD1F066B4; };
+		92C23BF47485EB97C1A7F909 /* Views/StudentExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC16C29FC91CCEB1FD89DA5; };
+		4F5ABB7A1BAD37221619E6B8 /* Views/StudentActivitiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F9E7076049BE716ED720E1; };
+		D2527D719C5DD991258164B1 /* Views/StudentDiscoveriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08B8A1E558B0F6B9505E167; };
+		4F72E298D77C332B64F4AEB8 /* Views/StudentProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CFC8584BD3880BA44A781E; };
+		E2D8063C01E781E2732F4417 /* Views/Facilitator/FacilitatorStudentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25FC3A4426BA434DB3CF909; };
+		D9CD20CF82663CAE3360C282 /* Views/Facilitator/FacilitatorReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A159AFF0C0F060A88BC446F3; };
+		7046129F9313077407FDA514 /* Views/Components/PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B54B0FF700A0312FBA7E67; };
+		FB6119668DE7CF1A9683AFF0 /* Views/Components/MaterialChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90EBF877E69CB1C46739B04B; };
 		88E519BA5EB5767A126B3880 /* AI/ModelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4781785C280FB94CE238F5 /* AI/ModelHandler.swift */; };
 		937E041A5EF73C3A85928AFB /* Views/Components/EmotionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81350316A2060E391DCA418F /* Views/Components/EmotionCard.swift */; };
 		93DDA89B0E458783C2B68694 /* Models/TreasureRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBBD2C8675281A14F0729DC /* Models/TreasureRecord.swift */; };
@@ -153,6 +163,16 @@
 		B1686925D791FBAFB68A96C8 /* Views/Components/SensoryStationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/SensoryStationCard.swift; sourceTree = "<group>"; };
 		B40746509AF54BFD56E3DAFD /* Views/Auth/AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Auth/AccountView.swift; sourceTree = "<group>"; };
 		FC1EB4534C48049861E4ECAA /* Views/Auth/RoleSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Auth/RoleSelectionView.swift; sourceTree = "<group>"; };
+		0D65E29C77FFCD9F7EA38483 /* Views/MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MainTabView.swift; sourceTree = "<group>"; };
+		06F7C2957EDDB04AD1F066B4 /* Views/StudentHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/StudentHomeView.swift; sourceTree = "<group>"; };
+		2BC16C29FC91CCEB1FD89DA5 /* Views/StudentExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/StudentExploreView.swift; sourceTree = "<group>"; };
+		26F9E7076049BE716ED720E1 /* Views/StudentActivitiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/StudentActivitiesView.swift; sourceTree = "<group>"; };
+		A08B8A1E558B0F6B9505E167 /* Views/StudentDiscoveriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/StudentDiscoveriesView.swift; sourceTree = "<group>"; };
+		C8CFC8584BD3880BA44A781E /* Views/StudentProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/StudentProfileView.swift; sourceTree = "<group>"; };
+		F25FC3A4426BA434DB3CF909 /* Views/Facilitator/FacilitatorStudentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Facilitator/FacilitatorStudentsView.swift; sourceTree = "<group>"; };
+		A159AFF0C0F060A88BC446F3 /* Views/Facilitator/FacilitatorReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Facilitator/FacilitatorReportsView.swift; sourceTree = "<group>"; };
+		D0B54B0FF700A0312FBA7E67 /* Views/Components/PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/PrimaryButton.swift; sourceTree = "<group>"; };
+		90EBF877E69CB1C46739B04B /* Views/Components/MaterialChecklistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/MaterialChecklistView.swift; sourceTree = "<group>"; };
 		B5A89409BF6F34928DDFFDF8 /* Models/FirestoreModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/FirestoreModels.swift; sourceTree = "<group>"; };
 		B671DCEC593540C05196C0D9 /* Models/ObservationRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/ObservationRecord.swift; sourceTree = "<group>"; };
 		BF0C12C3EA94AC4D7CF33BCD /* ViewModels/Activity1ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModels/Activity1ViewModel.swift; sourceTree = "<group>"; };
@@ -195,6 +215,16 @@
 				882B1B94D0363009E3D5E61B /* Views/Auth/ForgotPasswordView.swift */,
 				B40746509AF54BFD56E3DAFD /* Views/Auth/AccountView.swift */,
 				FC1EB4534C48049861E4ECAA /* Views/Auth/RoleSelectionView.swift */,
+				0D65E29C77FFCD9F7EA38483 /* Views/MainTabView.swift */,
+				06F7C2957EDDB04AD1F066B4 /* Views/StudentHomeView.swift */,
+				2BC16C29FC91CCEB1FD89DA5 /* Views/StudentExploreView.swift */,
+				26F9E7076049BE716ED720E1 /* Views/StudentActivitiesView.swift */,
+				A08B8A1E558B0F6B9505E167 /* Views/StudentDiscoveriesView.swift */,
+				C8CFC8584BD3880BA44A781E /* Views/StudentProfileView.swift */,
+				F25FC3A4426BA434DB3CF909 /* Views/Facilitator/FacilitatorStudentsView.swift */,
+				A159AFF0C0F060A88BC446F3 /* Views/Facilitator/FacilitatorReportsView.swift */,
+				D0B54B0FF700A0312FBA7E67 /* Views/Components/PrimaryButton.swift */,
+				90EBF877E69CB1C46739B04B /* Views/Components/MaterialChecklistView.swift */,
 				41FDBF9EF9EEB70C16408FB2 /* Views/ParticipantSelectionView.swift */,
 				1DE86E2309B9C8E3868C5625 /* Views/HomeDashboardView.swift */,
 				5741FF14DC867C2E6D83CD2B /* Views/SettingsView.swift */,
@@ -368,6 +398,16 @@
 				F3DA73EF3ECF79984215FFEF /* Views/Auth/ForgotPasswordView.swift in Sources */,
 				87286B1AB3EF13B2D3A06E4B /* Views/Auth/AccountView.swift in Sources */,
 				B0CD19AF110C09E20C515930 /* Views/Auth/RoleSelectionView.swift in Sources */,
+				5B134928CB03BCCBFD34B2AC /* Views/MainTabView.swift in Sources */,
+				FE66607BED926E49B7A9304C /* Views/StudentHomeView.swift in Sources */,
+				92C23BF47485EB97C1A7F909 /* Views/StudentExploreView.swift in Sources */,
+				4F5ABB7A1BAD37221619E6B8 /* Views/StudentActivitiesView.swift in Sources */,
+				D2527D719C5DD991258164B1 /* Views/StudentDiscoveriesView.swift in Sources */,
+				4F72E298D77C332B64F4AEB8 /* Views/StudentProfileView.swift in Sources */,
+				E2D8063C01E781E2732F4417 /* Views/Facilitator/FacilitatorStudentsView.swift in Sources */,
+				D9CD20CF82663CAE3360C282 /* Views/Facilitator/FacilitatorReportsView.swift in Sources */,
+				7046129F9313077407FDA514 /* Views/Components/PrimaryButton.swift in Sources */,
+				FB6119668DE7CF1A9683AFF0 /* Views/Components/MaterialChecklistView.swift in Sources */,
 				FCDB61401D9136E11C1F3D92 /* Views/ParticipantSelectionView.swift in Sources */,
 				86140CB8076C5AE4F8B4ABAD /* Views/HomeDashboardView.swift in Sources */,
 				1ED9AE877F6B92AE3A311987 /* Views/SettingsView.swift in Sources */,

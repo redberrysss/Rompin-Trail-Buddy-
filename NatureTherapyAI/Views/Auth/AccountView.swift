@@ -76,7 +76,7 @@ struct AccountView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 16)
                             .fill(AppTheme.cardBackground)
-                            .shadow(color: AppTheme.cardShadowColor, radius: 4, x: 0, y: 2)
+                            .shadow(color: AppTheme.cardShadow, radius: 4, x: 0, y: 2)
                     )
                     .padding(.horizontal, 24)
 

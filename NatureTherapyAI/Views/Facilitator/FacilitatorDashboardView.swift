@@ -6,123 +6,162 @@ struct FacilitatorDashboardView: View {
     @Query private var participants: [Participant]
     @Query private var sessions: [ActivitySession]
     @Query private var observations: [ObservationRecord]
-    @Query private var sensoryRecords: [SensoryRecord]
-    @Query private var treasureRecords: [TreasureRecord]
-    @Query private var artworks: [ArtworkRecord]
 
     @State private var searchText = ""
-    @State private var showAccount = false
 
     var body: some View {
         NavigationStack {
-            List {
-                headerSection
-                statsSection
-                if filteredParticipants.isEmpty {
-                    emptyState
-                } else {
-                    ForEach(filteredParticipants) { participant in
-                        NavigationLink {
-                            FacilitatorParticipantDetailView(participant: participant)
-                        } label: {
-                            participantRow(participant)
-                        }
-                    }
+            ScrollView {
+                VStack(spacing: 22) {
+                    welcomeHeader
+                    statsGrid
+                    quickActionsRow
+                    participantsSection
                 }
+                .padding(.horizontal, AppTheme.standardPadding)
+                .padding(.top, 16)
+                .padding(.bottom, 100)
             }
+            .background(AppTheme.creamBackground.ignoresSafeArea())
             .navigationTitle("Fasilitator")
-            .searchable(text: $searchText, prompt: "Cari peserta...")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showAccount = true
-                    } label: {
-                        Image(systemName: "person.circle.fill")
-                            .font(.title2)
-                    }
+            .navigationBarTitleDisplayMode(.large)
+        }
+    }
+
+    private var welcomeHeader: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Selamat datang, \(authVM.currentUserName ?? "Fasilitator")")
+                        .font(AppTheme.titleFont)
+                        .foregroundColor(AppTheme.darkGreen)
+                    Text("Panel kawalan kumpulan")
+                        .font(AppTheme.bodyFont)
+                        .foregroundColor(AppTheme.secondaryText)
+                }
+                Spacer()
+                ZStack {
+                    Circle()
+                        .fill(AppTheme.lightGreen.opacity(0.3))
+                        .frame(width: 56, height: 56)
+                    Image(systemName: "person.fill.gearshape")
+                        .font(.title2)
+                        .foregroundColor(AppTheme.forestGreen)
                 }
             }
-            .sheet(isPresented: $showAccount) {
-                AccountView()
-            }
         }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
+                .fill(AppTheme.cardBackground)
+                .shadow(color: AppTheme.cardShadow, radius: AppTheme.cardShadowRadius, x: 0, y: 4)
+        )
     }
 
-    private var filteredParticipants: [Participant] {
-        if searchText.isEmpty { return participants }
-        return participants.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-    }
-
-    private var headerSection: some View {
-        VStack(spacing: 4) {
-            Image(systemName: "person.2.fill")
-                .font(.system(size: 32))
-                .foregroundColor(AppTheme.forestGreen)
-            Text("Panel Fasilitator")
-                .font(AppTheme.titleFont)
-                .foregroundColor(AppTheme.darkGreen)
-            if let name = authVM.currentUserName {
-                Text("Selamat datang, \(name)")
-                    .font(AppTheme.captionFont)
-                    .foregroundColor(AppTheme.secondaryText)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .listRowBackground(Color.clear)
-        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-    }
-
-    private var statsSection: some View {
+    private var statsGrid: some View {
         let total = participants.count
         let active = sessions.filter { !$0.isCompleted }.count
         let completed = sessions.filter { $0.isCompleted }.count
+        let discoveries = observations.count
 
-        return VStack(spacing: 12) {
-            Text("Ringkasan").font(AppTheme.bodyFont).foregroundColor(AppTheme.darkGreen)
-            HStack(spacing: 20) {
-                statCard(value: "\(total)", label: "Peserta", icon: "person.3.fill", color: .blue)
-                statCard(value: "\(active)", label: "Aktif", icon: "play.fill", color: .orange)
-                statCard(value: "\(completed)", label: "Selesai", icon: "checkmark.circle.fill", color: .green)
-            }
+        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+            statCard(value: "\(total)", label: "Peserta", icon: "person.3.fill", color: AppTheme.softBlue)
+            statCard(value: "\(active)", label: "Aktif", icon: "play.fill", color: AppTheme.softOrange)
+            statCard(value: "\(completed)", label: "Selesai", icon: "checkmark.circle.fill", color: AppTheme.successGreen)
+            statCard(value: "\(discoveries)", label: "Penemuan", icon: "star.fill", color: AppTheme.softYellow)
         }
-        .frame(maxWidth: .infinity)
-        .listRowBackground(Color.clear)
     }
 
     private func statCard(value: String, label: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.title3)
+                .font(.title2)
                 .foregroundColor(color)
             Text(value)
-                .font(.title2.bold())
+                .font(AppTheme.titleFont)
                 .foregroundColor(AppTheme.darkGreen)
             Text(label)
-                .font(AppTheme.smallCaption)
+                .font(AppTheme.captionFont)
                 .foregroundColor(AppTheme.secondaryText)
         }
+        .padding(16)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .background(AppTheme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
+                .fill(AppTheme.cardBackground)
+                .shadow(color: AppTheme.cardShadow, radius: AppTheme.cardShadowRadius, x: 0, y: 4)
+        )
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "person.slash.fill")
-                .font(.system(size: 40))
-                .foregroundColor(AppTheme.secondaryText)
-            Text("Tiada peserta lagi")
-                .font(AppTheme.bodyFont)
-                .foregroundColor(AppTheme.secondaryText)
-            Text("Peserta akan muncul selepas mereka mendaftar dan memulakan aktiviti.")
-                .font(AppTheme.smallCaption)
-                .foregroundColor(AppTheme.secondaryText)
-                .multilineTextAlignment(.center)
+    private var quickActionsRow: some View {
+        HStack(spacing: 16) {
+            quickActionButton(icon: "person.badge.plus", label: "Tambah Pelajar", color: AppTheme.forestGreen)
+            quickActionButton(icon: "rectangle.stack.fill", label: "Aktiviti", color: AppTheme.softBlue)
+            quickActionButton(icon: "doc.text.fill", label: "Laporan", color: AppTheme.softOrange)
+        }
+    }
+
+    private func quickActionButton(icon: String, label: String, color: Color) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(.white)
+                .frame(width: 48, height: 48)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(color)
+                        .shadow(color: color.opacity(0.3), radius: 6, x: 0, y: 3)
+                )
+            Text(label)
+                .font(AppTheme.captionFont)
+                .foregroundColor(AppTheme.darkGreen)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
-        .listRowBackground(Color.clear)
+    }
+
+    private var participantsSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Image(systemName: "person.2.fill")
+                    .foregroundColor(AppTheme.forestGreen)
+                Text("Senarai Peserta")
+                    .font(AppTheme.headlineFont)
+                    .foregroundColor(AppTheme.darkGreen)
+                Spacer()
+                Text("\(participants.count) orang")
+                    .font(AppTheme.captionFont)
+                    .foregroundColor(AppTheme.secondaryText)
+            }
+
+            if participants.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "person.slash.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(AppTheme.secondaryText)
+                    Text("Tiada peserta lagi")
+                        .font(AppTheme.bodyFont)
+                        .foregroundColor(AppTheme.secondaryText)
+                    Text("Peserta akan muncul selepas mereka mendaftar.")
+                        .font(AppTheme.captionFont)
+                        .foregroundColor(AppTheme.secondaryText)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                .background(
+                    RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
+                        .fill(AppTheme.cardBackground)
+                )
+            } else {
+                ForEach(participants) { participant in
+                    NavigationLink {
+                        FacilitatorParticipantDetailView(participant: participant)
+                    } label: {
+                        participantRow(participant)
+                    }
+                }
+            }
+        }
     }
 
     private func participantRow(_ participant: Participant) -> some View {
@@ -131,62 +170,59 @@ struct FacilitatorDashboardView: View {
         let totalSessions = participantSessions.count
         let score = calculateScore(for: participant)
 
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack {
+        return HStack(spacing: 14) {
+            ZStack {
                 Circle()
-                    .fill(Color(participant.avatarColor))
-                    .frame(width: 40, height: 40)
-                    .overlay {
-                        Text(participant.name.prefix(1).uppercased())
-                            .font(.headline.bold())
-                            .foregroundColor(.white)
+                    .fill(Color(hex: participant.avatarColor))
+                    .frame(width: 48, height: 48)
+                Text(participant.name.prefix(1).uppercased())
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(participant.name)
+                    .font(AppTheme.subheadline)
+                    .foregroundColor(AppTheme.darkGreen)
+
+                HStack(spacing: 6) {
+                    Image(systemName: "rectangle.stack.fill")
+                        .font(.system(size: 10))
+                    Text("\(totalSessions) aktiviti")
+                        .font(AppTheme.captionFont)
+                    if completedSessions > 0 {
+                        Text("• \(completedSessions) selesai")
+                            .font(AppTheme.captionFont)
+                            .foregroundColor(AppTheme.successGreen)
                     }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(participant.name)
-                        .font(AppTheme.bodyFont)
-                        .foregroundColor(AppTheme.darkGreen)
-                    Text("\(totalSessions) sesi, \(completedSessions) selesai")
-                        .font(AppTheme.smallCaption)
-                        .foregroundColor(AppTheme.secondaryText)
                 }
+                .foregroundColor(AppTheme.secondaryText)
 
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("\(score, specifier: "%.0f")%")
-                        .font(.headline.bold())
-                        .foregroundColor(scoreColor(score))
-                    Text("Skor")
-                        .font(AppTheme.smallCaption)
-                        .foregroundColor(AppTheme.secondaryText)
+                if totalSessions > 0 {
+                    let pct = Double(completedSessions) / Double(max(totalSessions, 1))
+                    SwiftUI.ProgressView(value: pct)
+                        .tint(AppTheme.forestGreen)
                 }
             }
 
-            if totalSessions > 0 {
-                let pct = totalSessions > 0 ? Double(completedSessions) / Double(totalSessions) : 0
-                SwiftUI.ProgressView(value: pct)
-                    .tint(AppTheme.forestGreen)
-            }
+            Spacer()
 
-            let recentObs = observations.filter { $0.participantID == participant.id }
-            if !recentObs.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(recentObs.suffix(5)) { obs in
-                            if let path = obs.imagePath, let uiImage = loadImage(from: path) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                            }
-                        }
-                    }
-                }
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("\(score, specifier: "%.0f")%")
+                    .font(AppTheme.headlineFont)
+                    .foregroundColor(scoreColor(score))
+                Text("Skor")
+                    .font(AppTheme.captionFont)
+                    .foregroundColor(AppTheme.secondaryText)
             }
         }
-        .padding(.vertical, 4)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.smallCornerRadius)
+                .fill(AppTheme.cardBackground)
+                .shadow(color: AppTheme.cardShadow, radius: 4, x: 0, y: 2)
+        )
+        .padding(.horizontal, 2)
     }
 
     private func calculateScore(for participant: Participant) -> Double {
@@ -197,17 +233,13 @@ struct FacilitatorDashboardView: View {
     }
 
     private func scoreColor(_ score: Double) -> Color {
-        score >= 80 ? .green : score >= 50 ? .orange : .red
-    }
-
-    private func loadImage(from path: String) -> UIImage? {
-        ImageStorageService.shared.loadImage(at: path)
+        score >= 80 ? AppTheme.successGreen : score >= 50 ? AppTheme.softOrange : AppTheme.gentleCoral
     }
 }
 
 extension Participant {
     var avatarColor: String {
-        let colors = ["#4CAF50", "#2196F3", "#FF9800", "#9C27B0", "#F44336", "#00BCD4", "#FF5722", "#607D8B"]
+        let colors = ["2E7D32", "2196F3", "FF9800", "9C27B0", "F44336", "00BCD4", "FF5722", "607D8B"]
         let index = abs(name.hash) % colors.count
         return colors[index]
     }

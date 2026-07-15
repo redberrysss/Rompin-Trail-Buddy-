@@ -23,7 +23,7 @@ struct BadgeView: View {
             }
             .scaleEffect(scale)
             .onAppear {
-                withAnimation(AppAnimation.spring) {
+                withAnimation(AppTheme.gentleSpring) {
                     scale = 1
                 }
             }
@@ -81,7 +81,7 @@ struct BadgeGridView: View {
                 .background(
                     RoundedRectangle(cornerRadius: AppTheme.smallCornerRadius)
                         .fill(AppTheme.cardBackground)
-                        .shadow(color: AppTheme.cardShadowColor, radius: 4, x: 0, y: 2)
+                        .shadow(color: AppTheme.cardShadow, radius: 4, x: 0, y: 2)
                 )
             } else {
                 LazyVGrid(columns: [

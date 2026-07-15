@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct RootView: View {
     @State private var authVM = AuthenticationViewModel()
@@ -34,7 +35,7 @@ struct RootView: View {
 
     private var loadingView: some View {
         ZStack {
-            AppTheme.backgroundGradient.ignoresSafeArea()
+            AppTheme.creamBackground.ignoresSafeArea()
             VStack(spacing: 16) {
                 ProgressView()
                     .scaleEffect(1.5)
@@ -50,9 +51,9 @@ struct RootView: View {
     private func mainAppView(for role: String) -> some View {
         Group {
             if role == "facilitator" {
-                FacilitatorDashboardView()
+                MainTabView(participantID: nil, participantName: nil)
             } else {
-                ParticipantSelectionView()
+                MainTabView(participantID: UUID(), participantName: authVM.currentUserName ?? "Peserta")
             }
         }
         .onChange(of: authVM.authState) { _, newState in

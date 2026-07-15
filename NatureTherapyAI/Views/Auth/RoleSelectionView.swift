@@ -88,7 +88,7 @@ struct RoleSelectionView: View {
         .background(
             RoundedRectangle(cornerRadius: AppTheme.cardCornerRadius)
                 .fill(AppTheme.cardBackground)
-                .shadow(color: AppTheme.cardShadowColor, radius: AppTheme.cardShadowRadius, x: 0, y: 4)
+                .shadow(color: AppTheme.cardShadow, radius: AppTheme.cardShadowRadius, x: 0, y: 4)
         )
     }
 }
