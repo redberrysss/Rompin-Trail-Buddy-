@@ -3,6 +3,7 @@ import SwiftData
 import AVFoundation
 
 struct CameraView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = CameraViewModel()
     @State private var showInfoCard = false
@@ -111,6 +112,16 @@ struct CameraView: View {
     private var headerOverlay: some View {
         VStack {
             HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 28))
+                        .foregroundColor(.white)
+                        .shadow(radius: 2)
+                }
+                .accessibilityLabel("Tutup Kamera")
+
                 if viewModel.isSimulatorMode {
                     HStack(spacing: 6) {
                         Image(systemName: "iphone.gen3")

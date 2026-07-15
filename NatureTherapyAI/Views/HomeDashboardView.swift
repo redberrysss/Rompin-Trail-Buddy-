@@ -50,66 +50,64 @@ struct HomeDashboardView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        headerSection
-                        greetingSection
-                        progressSummarySection
-                        activityGridSection
-                        continueButtonSection
-                        facilitatorButtonSection
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-                    .padding(.bottom, 32)
+            ScrollView {
+                VStack(spacing: 24) {
+                    headerSection
+                    greetingSection
+                    progressSummarySection
+                    activityGridSection
+                    continueButtonSection
+                    facilitatorButtonSection
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 32)
             }
-            .navigationTitle("Rompin Forest Explorer")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    syncStatusIndicator
+        }
+        .navigationTitle("Rompin Forest Explorer")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                syncStatusIndicator
+            }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    showAccount = true
+                } label: {
+                    Image(systemName: "person.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
                 }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button {
-                        showAccount = true
-                    } label: {
-                        Image(systemName: "person.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel("Akaun")
+                .accessibilityLabel("Akaun")
 
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title2)
-                            .foregroundStyle(.secondary)
-                    }
-                    .accessibilityLabel("Tetapan")
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
                 }
+                .accessibilityLabel("Tetapan")
             }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
-            }
-            .sheet(isPresented: $showAccount) {
-                AccountView()
-            }
-            .sheet(isPresented: $showFacilitatorMode) {
-                FacilitatorModePlaceholder()
-            }
-            .navigationDestination(item: $navigateToActivity) { activity in
-                destinationView(for: activity)
-            }
-            .task {
-                viewModel.loadProgress(for: participantID, context: modelContext)
-            }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $showAccount) {
+            AccountView()
+        }
+        .sheet(isPresented: $showFacilitatorMode) {
+            FacilitatorModePlaceholder()
+        }
+        .navigationDestination(item: $navigateToActivity) { activity in
+            destinationView(for: activity)
+        }
+        .task {
+            viewModel.loadProgress(for: participantID, context: modelContext)
         }
     }
 
