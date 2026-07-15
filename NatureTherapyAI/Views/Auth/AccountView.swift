@@ -7,6 +7,7 @@ struct AccountView: View {
     @State private var showDeleteConfirmation = false
     @State private var showPasswordReset = false
     @State private var resetEmailSent = false
+    @State private var showLogoutConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -38,10 +39,7 @@ struct AccountView: View {
                             icon: "arrow.right.square",
                             title: "Log Keluar",
                             color: .orange,
-                            action: {
-                                authVM.signOut()
-                                dismiss()
-                            }
+                            action: { showLogoutConfirmation = true }
                         )
 
                         Divider().padding(.leading, 50)
@@ -101,6 +99,15 @@ struct AccountView: View {
                     Button("Tutup") { dismiss() }
                         .foregroundColor(AppTheme.forestGreen)
                 }
+            }
+            .alert("Log Keluar", isPresented: $showLogoutConfirmation) {
+                Button("Log Keluar", role: .destructive) {
+                    authVM.signOut()
+                    dismiss()
+                }
+                Button("Batal", role: .cancel) {}
+            } message: {
+                Text("Anda akan log keluar dari aplikasi.")
             }
             .alert("Padam Akaun", isPresented: $showDeleteConfirmation) {
                 Button("Padam", role: .destructive) {

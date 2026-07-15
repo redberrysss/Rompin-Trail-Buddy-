@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreImage
+import UIKit
 import OSLog
 
 final class SimulatorCameraManager: ObservableObject {
@@ -64,6 +65,13 @@ final class SimulatorCameraManager: ObservableObject {
             }
         }
         frameIndex += 1
+    }
+
+    func capturePhoto() -> UIImage? {
+        guard let cgImage = currentImage ?? loadSampleImage(for: currentPreset) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage)
     }
 
     private func loadSampleImage(for preset: Int) -> CGImage? {

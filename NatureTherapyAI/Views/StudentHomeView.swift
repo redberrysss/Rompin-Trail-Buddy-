@@ -8,6 +8,7 @@ struct StudentHomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AuthenticationViewModel.self) private var authVM
     @State private var navigateToActivity: ActivityType?
+    @State private var showHelp = false
 
     var body: some View {
         NavigationStack {
@@ -38,7 +39,7 @@ struct StudentHomeView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        navigateToActivity = nil
+                        showHelp = true
                     } label: {
                         Image(systemName: "questionmark.circle.fill")
                             .font(.title2)
@@ -49,6 +50,14 @@ struct StudentHomeView: View {
             }
             .navigationDestination(item: $navigateToActivity) { activity in
                 destinationView(for: activity)
+            }
+            .navigationDestination(isPresented: $showDiscoveries) {
+                StudentDiscoveriesView()
+            }
+            .alert("Bantuan", isPresented: $showHelp) {
+                Button("Tutup", role: .cancel) {}
+            } message: {
+                Text("Gunakan butang di bawah untuk memulakan aktiviti. Tekan butang Kamera untuk mengambil gambar penemuan alam. Aktiviti akan dikunci sehingga yang sebelumnya selesai.")
             }
         }
     }
@@ -191,12 +200,41 @@ struct StudentHomeView: View {
         )
     }
 
+    @State private var showCamera = false
+    @State private var showDiscoveries = false
+
     private var quickActions: some View {
         HStack(spacing: 16) {
-            quickActionButton(icon: "star.fill", label: "Penemuan", color: AppTheme.softYellow)
-            quickActionButton(icon: "camera.fill", label: "Kamera", color: AppTheme.softBlue)
-            quickActionButton(icon: "trophy.fill", label: "Pencapaian", color: AppTheme.softOrange)
-            quickActionButton(icon: "face.smiling.fill", label: "Emosi", color: AppTheme.lavender)
+            Button {
+                showDiscoveries = true
+            } label: {
+                quickActionButton(icon: "star.fill", label: "Penemuan", color: AppTheme.softYellow)
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                showCamera = true
+            } label: {
+                quickActionButton(icon: "camera.fill", label: "Kamera", color: AppTheme.softBlue)
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                StudentProfileView()
+            } label: {
+                quickActionButton(icon: "trophy.fill", label: "Pencapaian", color: AppTheme.softOrange)
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                Activity2SensoryView(participantID: participantID, participantName: participantName)
+            } label: {
+                quickActionButton(icon: "face.smiling.fill", label: "Emosi", color: AppTheme.lavender)
+            }
+            .buttonStyle(.plain)
+        }
+        .sheet(isPresented: $showCamera) {
+            CameraView()
         }
     }
 

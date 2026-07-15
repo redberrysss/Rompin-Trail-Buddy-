@@ -36,9 +36,13 @@
         <string>UIInterfaceOrientationPortrait</string>
     </array>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Mikrofon digunakan secara pilihan untuk merakam bunyi alam.</string>
+    <string>Mikrofon digunakan secara pilihan untuk merakam bunyi alam semasa aktiviti sensori.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Galeri digunakan untuk memilih atau menyimpan gambar aktiviti peserta.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Aplikasi perlu menyimpan gambar penemuan alam dan hasil seni ke galeri anda.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Lokasi digunakan untuk menyimpan tempat penemuan alam semasa penerokaan.</string>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>

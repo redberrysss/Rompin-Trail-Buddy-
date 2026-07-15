@@ -37,7 +37,7 @@ struct RoleSelectionView: View {
                 .buttonStyle(ScaleButtonStyle())
 
                 Button {
-                    onSelectRole("peserta")
+                    onSelectRole("student")
                 } label: {
                     roleCard(
                         icon: "person.fill",

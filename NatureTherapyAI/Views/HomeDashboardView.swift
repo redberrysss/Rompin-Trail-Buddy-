@@ -142,11 +142,11 @@ struct HomeDashboardView: View {
                         Button {
                             showSettings = true
                         } label: {
-                            Image(systemName: "pencil.circle.fill")
+                            Image(systemName: "gearshape.fill")
                                 .font(.title3)
                                 .foregroundStyle(.blue)
                         }
-                        .accessibilityLabel("Tukar nama peserta")
+                        .accessibilityLabel("Tetapan")
                     }
                 }
 

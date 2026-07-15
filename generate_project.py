@@ -76,6 +76,7 @@ SOURCE_FILES = [
     "Views/Components/ActivityCard.swift",
     "Views/Components/PrimaryButton.swift",
     "Views/Components/MaterialChecklistView.swift",
+    "Views/Components/SimulatorCameraView.swift",
     "Camera/CameraManager.swift",
     "Camera/CameraPreview.swift",
     "Camera/SimulatorCameraManager.swift",

@@ -95,9 +95,26 @@ struct FacilitatorDashboardView: View {
 
     private var quickActionsRow: some View {
         HStack(spacing: 16) {
-            quickActionButton(icon: "person.badge.plus", label: "Tambah Pelajar", color: AppTheme.forestGreen)
-            quickActionButton(icon: "rectangle.stack.fill", label: "Aktiviti", color: AppTheme.softBlue)
-            quickActionButton(icon: "doc.text.fill", label: "Laporan", color: AppTheme.softOrange)
+            NavigationLink {
+                FacilitatorStudentsView()
+            } label: {
+                quickActionButton(icon: "person.badge.plus", label: "Tambah Pelajar", color: AppTheme.forestGreen)
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                FacilitatorActivitiesView()
+            } label: {
+                quickActionButton(icon: "rectangle.stack.fill", label: "Aktiviti", color: AppTheme.softBlue)
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                FacilitatorReportsView()
+            } label: {
+                quickActionButton(icon: "doc.text.fill", label: "Laporan", color: AppTheme.softOrange)
+            }
+            .buttonStyle(.plain)
         }
     }
 

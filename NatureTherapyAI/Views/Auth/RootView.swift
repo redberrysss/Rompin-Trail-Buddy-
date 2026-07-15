@@ -6,12 +6,20 @@ struct RootView: View {
     @State private var selectedRole: String?
 
     var body: some View {
-        if let role = selectedRole {
-            authContent(for: role)
-                .environment(authVM)
-        } else {
-            RoleSelectionView { role in
-                selectedRole = role
+        Group {
+            if let role = selectedRole {
+                authContent(for: role)
+                    .environment(authVM)
+            } else {
+                RoleSelectionView { role in
+                    selectedRole = role
+                    authVM.selectedRole = role
+                }
+            }
+        }
+        .onChange(of: authVM.authState) { _, newState in
+            if newState == .unauthenticated {
+                selectedRole = nil
             }
         }
     }
@@ -22,14 +30,23 @@ struct RootView: View {
         case .loading:
             loadingView
         case .authenticated:
-            mainAppView(for: role)
+            if authVM.userRole == role {
+                mainAppView(for: role)
+            } else {
+                loadingView
+                    .onAppear {
+                        // Wait for role to be fetched
+                        Task {
+                            try? await Task.sleep(nanoseconds: 2_000_000_000)
+                            if authVM.userRole != role {
+                                authVM.errorMessage = "Peranan tidak sepadan. Sila cuba lagi."
+                                authVM.signOut()
+                            }
+                        }
+                    }
+            }
         case .unauthenticated:
             LoginView(authVM: $authVM)
-                .onChange(of: authVM.authState) { _, newState in
-                    if newState == .unauthenticated {
-                        selectedRole = nil
-                    }
-                }
         }
     }
 
@@ -54,11 +71,6 @@ struct RootView: View {
                 MainTabView(participantID: nil, participantName: nil)
             } else {
                 MainTabView(participantID: UUID(), participantName: authVM.currentUserName ?? "Peserta")
-            }
-        }
-        .onChange(of: authVM.authState) { _, newState in
-            if newState == .unauthenticated {
-                selectedRole = nil
             }
         }
     }

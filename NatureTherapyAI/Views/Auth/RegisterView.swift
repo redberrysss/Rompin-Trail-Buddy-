@@ -43,7 +43,7 @@ struct RegisterView: View {
                                 .foregroundColor(AppTheme.darkGreen)
 
                             HStack(spacing: 12) {
-                                roleButton(role: "peserta", title: "Peserta", icon: "person.fill", color: AppTheme.softBlue)
+                                roleButton(role: "student", title: "Peserta", icon: "person.fill", color: AppTheme.softBlue)
                                 roleButton(role: "facilitator", title: "Fasilitator", icon: "person.fill.gearshape", color: AppTheme.forestGreen)
                             }
                         }

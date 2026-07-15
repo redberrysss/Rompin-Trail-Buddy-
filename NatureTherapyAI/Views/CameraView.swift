@@ -10,21 +10,30 @@ struct CameraView: View {
     @State private var selectedDetection: DetectionResult?
     @State private var detectedInfo: NatureObject?
     @State private var infoCardOffset: CGFloat = 400
+    @State private var discoveryName = ""
+    @State private var selectedCategory = "alam"
+    @State private var showSaveDialog = false
+
+    private let categories = ["alam", "pokok", "bunga", "serangga", "burung", "haiwan"]
 
     var body: some View {
         ZStack {
-            if viewModel.isSimulatorMode {
+            if viewModel.showPreview, let image = viewModel.capturedImage {
+                previewContent(image: image)
+            } else if viewModel.isSimulatorMode {
                 SimulatorCameraView(viewModel: viewModel)
             } else {
                 realCameraContent
             }
 
-            VStack {
-                headerOverlay
-                Spacer()
-                if !viewModel.isSimulatorMode {
-                    detectionChips
-                        .padding(.bottom, 100)
+            if !viewModel.showPreview {
+                VStack {
+                    headerOverlay
+                    Spacer()
+                    if !viewModel.isSimulatorMode {
+                        detectionChips
+                            .padding(.bottom, 100)
+                    }
                 }
             }
 
@@ -57,12 +66,18 @@ struct CameraView: View {
 
                 if !viewModel.detections.isEmpty {
                     BoundingBoxOverlay(detections: viewModel.detections) { detection in
-                        withAnimation(AppAnimation.spring) {
+                        withAnimation(AppTheme.gentleSpring) {
                             selectedDetection = detection
                             detectedInfo = NatureObject.sample(for: detection.objectName)
                             showInfoCard = true
                         }
                     }
+                }
+
+                VStack {
+                    Spacer()
+                    captureButton
+                        .padding(.bottom, 50)
                 }
             } else {
                 Color.black.ignoresSafeArea()
@@ -76,6 +91,19 @@ struct CameraView: View {
                             .foregroundColor(.white.opacity(0.7))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
+                        if error.contains("ditolak") || error.contains("denied") || error.contains("Settings") {
+                            Button("Buka Tetapan") {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                            .font(AppTheme.bodyFont.bold())
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 12)
+                            .background(Color.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
                     }
                 } else {
                     ProgressView()
@@ -86,26 +114,142 @@ struct CameraView: View {
         }
     }
 
+    private var captureButton: some View {
+        Button(action: {
+            viewModel.capturePhoto()
+        }) {
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 72, height: 72)
+                    .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+
+                Circle()
+                    .stroke(Color.white, lineWidth: 4)
+                    .frame(width: 80, height: 80)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Ambil Gambar")
+        .disabled(viewModel.isUploading)
+    }
+
+    private func previewContent(image: UIImage) -> some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .ignoresSafeArea()
+
+            VStack {
+                HStack {
+                    Button("Ambil Semula") {
+                        viewModel.retakePhoto()
+                    }
+                    .font(AppTheme.bodyFont.bold())
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(Color.gray.opacity(0.6))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    Spacer()
+                }
+                .padding(.horizontal, AppTheme.standardPadding)
+                .padding(.top, 60)
+
+                Spacer()
+
+                VStack(spacing: 12) {
+                    if let error = viewModel.uploadError {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.red)
+                            Text(error)
+                                .font(AppTheme.captionFont)
+                                .foregroundColor(.red)
+                        }
+                        .padding(12)
+                        .background(Color.white.opacity(0.9))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+
+                    if viewModel.isUploading {
+                        HStack(spacing: 12) {
+                            ProgressView()
+                                .tint(.white)
+                            Text(viewModel.uploadStatus ?? "Memuat naik...")
+                                .font(AppTheme.bodyFont)
+                                .foregroundColor(.white)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    } else {
+                        Button(action: {
+                            showSaveDialog = true
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "square.and.arrow.down.fill")
+                                Text("Simpan")
+                            }
+                            .font(AppTheme.largeButtonFont)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.buttonCornerRadius)
+                                    .fill(AppTheme.primaryGradient)
+                                    .shadow(color: AppTheme.forestGreen.opacity(0.3), radius: 8, x: 0, y: 4)
+                            )
+                        }
+                        .padding(.horizontal, AppTheme.standardPadding)
+                    }
+                }
+                .padding(.bottom, 50)
+            }
+        }
+        .alert("Simpan Penemuan", isPresented: $showSaveDialog) {
+            TextField("Nama penemuan", text: $discoveryName)
+            Picker("Kategori", selection: $selectedCategory) {
+                ForEach(categories, id: \.self) { cat in
+                    Text(cat.capitalized).tag(cat)
+                }
+            }
+            Button("Simpan") {
+                Task {
+                    await viewModel.savePhoto(discoveryName: discoveryName.isEmpty ? "Penemuan Baru" : discoveryName, category: selectedCategory)
+                }
+            }
+            Button("Batal", role: .cancel) {}
+        } message: {
+            Text("Namakan penemuan anda dan pilih kategori.")
+        }
+    }
+
     private var scanOverlay: some View {
         VStack {
             Spacer()
             ZStack {
                 RoundedRectangle(cornerRadius: 40)
                     .fill(.ultraThinMaterial)
-                    .frame(height: 180)
+                    .frame(height: 120)
 
-                VStack(spacing: 8) {
+                VStack(spacing: 6) {
                     Image(systemName: "viewfinder")
-                        .font(.system(size: 32, weight: .thin))
+                        .font(.system(size: 28, weight: .thin))
                         .foregroundColor(.white.opacity(0.7))
 
-                    Text("Point at nature objects to identify them")
+                    Text("Arahkan ke objek alam untuk dikenal pasti")
                         .font(AppTheme.captionFont)
                         .foregroundColor(.white.opacity(0.8))
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 40)
+            .padding(.bottom, 120)
         }
     }
 
@@ -169,7 +313,7 @@ struct CameraView: View {
             HStack(spacing: 10) {
                 ForEach(viewModel.detections) { result in
                     Button(action: {
-                        withAnimation(AppAnimation.spring) {
+                        withAnimation(AppTheme.gentleSpring) {
                             selectedDetection = result
                             detectedInfo = NatureObject.sample(for: result.objectName)
                             showInfoCard = true
@@ -230,7 +374,7 @@ struct CameraView: View {
                     Spacer()
 
                     Button(action: {
-                        withAnimation(AppAnimation.spring) {
+                        withAnimation(AppTheme.gentleSpring) {
                             showInfoCard = false
                             selectedDetection = nil
                         }
@@ -262,7 +406,7 @@ struct CameraView: View {
                     }
 
                     Button(action: {
-                        withAnimation(AppAnimation.spring) {
+                        withAnimation(AppTheme.gentleSpring) {
                             showInfoCard = false
                             selectedDetection = nil
                         }
@@ -287,155 +431,6 @@ struct CameraView: View {
             .padding(.horizontal, AppTheme.standardPadding)
             .padding(.bottom, 20)
             .transition(.move(edge: .bottom).combined(with: .opacity))
-        }
-    }
-}
-
-struct SimulatorCameraView: View {
-    @ObservedObject var viewModel: CameraViewModel
-    @State private var selectedPreset = 0
-
-    let samplePresets = [
-        ("Forest", "🌳"),
-        ("River", "🏞️"),
-        ("Garden", "🌸"),
-        ("Wildlife", "🐦")
-    ]
-
-    var body: some View {
-        ZStack {
-            Color(red: 0.08, green: 0.1, blue: 0.08)
-                .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                if let error = viewModel.simulatorCamera?.modelError {
-                    VStack(spacing: 12) {
-                        Image(systemName: "photo.badge.exclamationmark")
-                            .font(.system(size: 44))
-                            .foregroundColor(AppTheme.softOrange)
-                        Text(error)
-                            .font(AppTheme.bodyFont)
-                            .foregroundColor(.white.opacity(0.7))
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 32)
-                    }
-                    .padding(.top, 120)
-                } else if let image = viewModel.simulatorCamera?.currentImage {
-                    ZStack {
-                        Image(decorative: image, scale: 1.0)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .cornerRadius(20)
-
-                        BoundingBoxOverlay(
-                            detections: viewModel.detections
-                        ) { detection in
-                            withAnimation(AppAnimation.spring) {
-                                viewModel.showDiscoveryFor(detection: detection)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, AppTheme.standardPadding)
-                    .padding(.top, 100)
-                } else {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(red: 0.12, green: 0.14, blue: 0.12))
-                        .frame(height: 320)
-                        .overlay(
-                            VStack(spacing: 12) {
-                                Image(systemName: "leaf.fill")
-                                    .font(.system(size: 44))
-                                    .foregroundColor(AppTheme.lightGreen)
-                                Text("Simulator Ready")
-                                    .font(AppTheme.subheadline)
-                                    .foregroundColor(.white)
-                                Text("Start to test AI detection")
-                                    .font(AppTheme.captionFont)
-                                    .foregroundColor(.white.opacity(0.6))
-                            }
-                        )
-                        .padding(.horizontal, AppTheme.standardPadding)
-                        .padding(.top, 100)
-                }
-
-                if !viewModel.detections.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(viewModel.detections) { result in
-                                Button(action: { viewModel.showDiscoveryFor(detection: result) }) {
-                                    HStack(spacing: 6) {
-                                        Text(result.objectName)
-                                            .font(AppTheme.captionFont)
-                                            .foregroundColor(.white)
-                                        Text(result.confidencePercentage)
-                                            .font(AppTheme.smallCaption)
-                                            .foregroundColor(.white.opacity(0.8))
-                                    }
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 8)
-                                    .background(
-                                        Capsule()
-                                            .fill(AppTheme.forestGreen.opacity(0.85))
-                                    )
-                                }
-                            }
-                        }
-                        .padding(.horizontal, AppTheme.standardPadding)
-                    }
-                    .padding(.top, 12)
-                }
-
-                Spacer()
-
-                HStack(spacing: 14) {
-                    ForEach(Array(samplePresets.enumerated()), id: \.offset) { index, preset in
-                        Button(action: {
-                            selectedPreset = index
-                            viewModel.simulatorCamera?.selectPreset(index)
-                        }) {
-                            VStack(spacing: 5) {
-                                Text(preset.1)
-                                    .font(.system(size: 22))
-                                Text(preset.0)
-                                    .font(AppTheme.smallCaption)
-                                    .foregroundColor(selectedPreset == index ? .white : .white.opacity(0.6))
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14)
-                                    .fill(selectedPreset == index ? AppTheme.forestGreen : Color.white.opacity(0.08))
-                            )
-                        }
-                    }
-                }
-                .padding(.horizontal, AppTheme.standardPadding)
-
-                Button(action: {
-                    if viewModel.simulatorCamera?.isRunning == true {
-                        viewModel.simulatorCamera?.stopSimulatorCamera()
-                    } else {
-                        viewModel.simulatorCamera?.startSimulatorCamera()
-                    }
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: viewModel.simulatorCamera?.isRunning == true ? "stop.fill" : "play.fill")
-                        Text(viewModel.simulatorCamera?.isRunning == true ? "Stop" : "Start Detection")
-                    }
-                    .font(AppTheme.largeButtonFont)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        RoundedRectangle(cornerRadius: AppTheme.buttonCornerRadius)
-                            .fill(viewModel.simulatorCamera?.isRunning == true ? Color.red : AppTheme.forestGreen)
-                            .shadow(color: (viewModel.simulatorCamera?.isRunning == true ? Color.red : AppTheme.forestGreen).opacity(0.3), radius: 8, x: 0, y: 4)
-                    )
-                }
-                .padding(.horizontal, AppTheme.standardPadding)
-                .padding(.bottom, 30)
-                .padding(.top, 12)
-            }
         }
     }
 }

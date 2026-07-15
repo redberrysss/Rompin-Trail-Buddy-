@@ -15,6 +15,9 @@ struct StudentProfileView: View {
                     statsCard
                     achievementsSection
                     badgesSection
+
+                    logoutSection
+                        .padding(.top, 8)
                 }
                 .padding(.horizontal, AppTheme.standardPadding)
                 .padding(.top, 16)
@@ -23,6 +26,14 @@ struct StudentProfileView: View {
             .background(AppTheme.creamBackground.ignoresSafeArea())
             .navigationTitle("Profil Saya")
             .navigationBarTitleDisplayMode(.large)
+            .alert("Log Keluar", isPresented: $showLogoutConfirmation) {
+                Button("Log Keluar", role: .destructive) {
+                    authVM.signOut()
+                }
+                Button("Batal", role: .cancel) {}
+            } message: {
+                Text("Anda akan log keluar dari aplikasi. Anda perlu log masuk semula untuk menggunakan aplikasi.")
+            }
         }
     }
 
@@ -118,6 +129,41 @@ struct StudentProfileView: View {
             badgeItem(icon: "🏆", label: "Master", unlocked: false)
         }
     }
+
+    private var logoutSection: some View {
+        VStack(spacing: 12) {
+            Button(action: { showLogoutConfirmation = true }) {
+                HStack(spacing: 12) {
+                    Image(systemName: "arrow.right.square")
+                        .font(.system(size: 16))
+                        .foregroundColor(.orange)
+                        .frame(width: 36, height: 36)
+                        .background(Color.orange.opacity(0.1))
+                        .clipShape(Circle())
+
+                    Text("Log Keluar")
+                        .font(AppTheme.bodyFont)
+                        .foregroundColor(AppTheme.darkGreen)
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(AppTheme.secondaryText)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(AppTheme.cardBackground)
+                        .shadow(color: AppTheme.cardShadow, radius: 4, x: 0, y: 2)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    @State private var showLogoutConfirmation = false
 
     private func badgeItem(icon: String, label: String, unlocked: Bool) -> some View {
         VStack(spacing: 8) {

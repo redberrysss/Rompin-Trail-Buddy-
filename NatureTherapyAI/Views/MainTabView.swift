@@ -163,8 +163,6 @@ struct FacilitatorActivitiesView: View {
 
 struct FacilitatorProfileView: View {
     var body: some View {
-        NavigationStack {
-            AccountView()
-        }
+        AccountView()
     }
 }

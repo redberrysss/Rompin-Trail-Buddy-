@@ -1,4 +1,5 @@
 import SwiftUI
+import OSLog
 
 #if canImport(FirebaseAuth)
 import FirebaseAuth
@@ -13,14 +14,15 @@ enum AuthState {
 @Observable
 final class AuthenticationViewModel {
     private let authService = AuthenticationService.shared
+    private let logger = Logger(subsystem: "com.rompinforest.auth", category: "AuthViewModel")
 
     var authState: AuthState = .loading
     var currentUserID: String?
     var currentUserName: String?
     var currentUserEmail: String?
 
-    var userRole: String = "participant"
-    var selectedRole: String = "participant"
+    var userRole: String = "student"
+    var selectedRole: String = "student"
 
     var email = ""
     var password = ""
@@ -44,10 +46,7 @@ final class AuthenticationViewModel {
                 self.authState = .authenticated
                 Task { await self.fetchRole() }
             } else {
-                self.currentUserID = nil
-                self.currentUserName = nil
-                self.currentUserEmail = nil
-                self.userRole = "participant"
+                self.clearAuthState()
                 self.authState = .unauthenticated
             }
         }
@@ -61,8 +60,17 @@ final class AuthenticationViewModel {
         do {
             if let role = try await authService.fetchUserRole(uid: uid) {
                 userRole = role
+                logger.info("Fetched role from Firestore: \(role)")
+            } else {
+                logger.warning("No role found in Firestore for user \(uid)")
+                errorMessage = "Profil pengguna tidak dijumpai. Sila hubungi fasilitator."
+                authState = .unauthenticated
             }
-        } catch {}
+        } catch {
+            logger.error("Failed to fetch role: \(error.localizedDescription)")
+            errorMessage = "Gagal mendapatkan peranan pengguna."
+            authState = .unauthenticated
+        }
     }
 
     func signIn() async {
@@ -79,9 +87,35 @@ final class AuthenticationViewModel {
         errorMessage = nil
         do {
             try await authService.signIn(email: email, password: password)
+
+            // After sign in, wait for the auth listener to update state and fetch role
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+            // Validate that the fetched role matches the selected role
+            guard currentUserID != nil else {
+                errorMessage = "Gagal mengesahkan identiti pengguna."
+                isLoading = false
+                return
+            }
+
+            // Re-fetch role to ensure we have latest
+            await fetchRole()
+
+            if userRole != selectedRole {
+                // Role mismatch - sign out and show error
+                let correctRole = userRole == "student" ? "Peserta" : "Fasilitator"
+                errorMessage = "Akaun ini didaftarkan sebagai \(correctRole). Sila pilih \(correctRole) untuk log masuk."
+                try? authService.signOut()
+                clearAuthState()
+                authState = .unauthenticated
+                isLoading = false
+                return
+            }
+
             clearForm()
         } catch {
             errorMessage = authService.mapFirebaseError(error)
+            logger.error("Sign in failed: \(error.localizedDescription)")
         }
         isLoading = false
     }
@@ -112,20 +146,36 @@ final class AuthenticationViewModel {
         errorMessage = nil
         do {
             try await authService.register(fullName: fullName, email: email, password: password, role: selectedRole)
-            userRole = selectedRole
+
+            // Wait for Firestore profile to be created and auth listener to fire
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+            // Verify role was saved
+            if let uid = currentUserID {
+                if let savedRole = try? await authService.fetchUserRole(uid: uid) {
+                    userRole = savedRole
+                    logger.info("Registration complete, role: \(savedRole)")
+                }
+            }
+
             clearForm()
         } catch {
             errorMessage = authService.mapFirebaseError(error)
+            logger.error("Registration failed: \(error.localizedDescription)")
         }
         isLoading = false
     }
 
     func signOut() {
+        errorMessage = nil
         do {
             try authService.signOut()
+            clearAuthState()
             clearForm()
+            logger.info("User signed out successfully")
         } catch {
             errorMessage = authService.mapFirebaseError(error)
+            logger.error("Sign out failed: \(error.localizedDescription)")
         }
     }
 
@@ -150,10 +200,20 @@ final class AuthenticationViewModel {
         errorMessage = nil
         do {
             try await authService.deleteAccount()
+            clearAuthState()
         } catch {
             errorMessage = authService.mapFirebaseError(error)
         }
         isLoading = false
+    }
+
+    private func clearAuthState() {
+        currentUserID = nil
+        currentUserName = nil
+        currentUserEmail = nil
+        userRole = "student"
+        selectedRole = "student"
+        authState = .unauthenticated
     }
 
     private func clearForm() {
