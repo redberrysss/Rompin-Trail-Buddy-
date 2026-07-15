@@ -36,6 +36,8 @@ SOURCE_FILES = [
     "Views/Auth/RegisterView.swift",
     "Views/Auth/ForgotPasswordView.swift",
     "Views/Auth/AccountView.swift",
+    "Views/Auth/RoleSelectionView.swift",
+    "Views/Auth/RoleSelectionView.swift",
     "Views/ParticipantSelectionView.swift",
     "Views/HomeDashboardView.swift",
     "Views/SettingsView.swift",

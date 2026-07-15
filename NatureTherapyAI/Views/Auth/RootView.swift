@@ -2,15 +2,33 @@ import SwiftUI
 
 struct RootView: View {
     @State private var authVM = AuthenticationViewModel()
+    @State private var selectedRole: String?
 
     var body: some View {
+        if let role = selectedRole {
+            authContent(for: role)
+                .environment(authVM)
+        } else {
+            RoleSelectionView { role in
+                selectedRole = role
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func authContent(for role: String) -> some View {
         switch authVM.authState {
         case .loading:
             loadingView
         case .authenticated:
-            mainAppView
+            mainAppView(for: role)
         case .unauthenticated:
             LoginView(authVM: $authVM)
+                .onChange(of: authVM.authState) { _, newState in
+                    if newState == .unauthenticated {
+                        selectedRole = nil
+                    }
+                }
         }
     }
 
@@ -28,14 +46,19 @@ struct RootView: View {
         }
     }
 
-    private var mainAppView: some View {
+    @ViewBuilder
+    private func mainAppView(for role: String) -> some View {
         Group {
-            if authVM.userRole == "facilitator" {
+            if role == "facilitator" {
                 FacilitatorDashboardView()
             } else {
                 ParticipantSelectionView()
             }
         }
-        .environment(authVM)
+        .onChange(of: authVM.authState) { _, newState in
+            if newState == .unauthenticated {
+                selectedRole = nil
+            }
+        }
     }
 }

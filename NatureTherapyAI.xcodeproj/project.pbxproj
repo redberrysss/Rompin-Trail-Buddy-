@@ -57,6 +57,7 @@
 		823A675AF3F25E0197047A73 /* Views/FacilitatorModePlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138DDA2F67986500ED13697F /* Views/FacilitatorModePlaceholder.swift */; };
 		86140CB8076C5AE4F8B4ABAD /* Views/HomeDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE86E2309B9C8E3868C5625 /* Views/HomeDashboardView.swift */; };
 		87286B1AB3EF13B2D3A06E4B /* Views/Auth/AccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40746509AF54BFD56E3DAFD /* Views/Auth/AccountView.swift */; };
+		B0CD19AF110C09E20C515930 /* Views/Auth/RoleSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1EB4534C48049861E4ECAA /* Views/Auth/RoleSelectionView.swift */; };
 		88E519BA5EB5767A126B3880 /* AI/ModelHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4781785C280FB94CE238F5 /* AI/ModelHandler.swift */; };
 		937E041A5EF73C3A85928AFB /* Views/Components/EmotionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81350316A2060E391DCA418F /* Views/Components/EmotionCard.swift */; };
 		93DDA89B0E458783C2B68694 /* Models/TreasureRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBBD2C8675281A14F0729DC /* Models/TreasureRecord.swift */; };
@@ -151,6 +152,7 @@
 		A867EC9D30E88ED56685968F /* App/Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/Theme.swift; sourceTree = "<group>"; };
 		B1686925D791FBAFB68A96C8 /* Views/Components/SensoryStationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Components/SensoryStationCard.swift; sourceTree = "<group>"; };
 		B40746509AF54BFD56E3DAFD /* Views/Auth/AccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Auth/AccountView.swift; sourceTree = "<group>"; };
+		FC1EB4534C48049861E4ECAA /* Views/Auth/RoleSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/Auth/RoleSelectionView.swift; sourceTree = "<group>"; };
 		B5A89409BF6F34928DDFFDF8 /* Models/FirestoreModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/FirestoreModels.swift; sourceTree = "<group>"; };
 		B671DCEC593540C05196C0D9 /* Models/ObservationRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models/ObservationRecord.swift; sourceTree = "<group>"; };
 		BF0C12C3EA94AC4D7CF33BCD /* ViewModels/Activity1ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModels/Activity1ViewModel.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				67F4B664596437BE72F159CB /* Views/Auth/RegisterView.swift */,
 				882B1B94D0363009E3D5E61B /* Views/Auth/ForgotPasswordView.swift */,
 				B40746509AF54BFD56E3DAFD /* Views/Auth/AccountView.swift */,
+				FC1EB4534C48049861E4ECAA /* Views/Auth/RoleSelectionView.swift */,
 				41FDBF9EF9EEB70C16408FB2 /* Views/ParticipantSelectionView.swift */,
 				1DE86E2309B9C8E3868C5625 /* Views/HomeDashboardView.swift */,
 				5741FF14DC867C2E6D83CD2B /* Views/SettingsView.swift */,
@@ -364,6 +367,7 @@
 				2AD3A222F5EAB6E07ECC88E6 /* Views/Auth/RegisterView.swift in Sources */,
 				F3DA73EF3ECF79984215FFEF /* Views/Auth/ForgotPasswordView.swift in Sources */,
 				87286B1AB3EF13B2D3A06E4B /* Views/Auth/AccountView.swift in Sources */,
+				B0CD19AF110C09E20C515930 /* Views/Auth/RoleSelectionView.swift in Sources */,
 				FCDB61401D9136E11C1F3D92 /* Views/ParticipantSelectionView.swift in Sources */,
 				86140CB8076C5AE4F8B4ABAD /* Views/HomeDashboardView.swift in Sources */,
 				1ED9AE877F6B92AE3A311987 /* Views/SettingsView.swift in Sources */,
