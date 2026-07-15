@@ -34,17 +34,28 @@ final class AuthenticationViewModel {
     var errorMessage: String?
 
     private var authStateHandler: Any?
+    private var isSigningIn = false
 
     init() {
         #if canImport(FirebaseAuth)
         authStateHandler = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             guard let self else { return }
             if let user {
+                let wasLoading = self.authState == .loading
                 self.currentUserID = user.uid
                 self.currentUserName = user.displayName
                 self.currentUserEmail = user.email
-                self.authState = .authenticated
-                Task { await self.fetchRole() }
+
+                if wasLoading {
+                    // App launch with existing session
+                    Task {
+                        await self.fetchRole()
+                        if self.authState == .loading {
+                            self.authState = .authenticated
+                        }
+                    }
+                }
+                // During signIn/register, authState is set manually after validation
             } else {
                 self.clearAuthState()
                 self.authState = .unauthenticated
@@ -85,39 +96,49 @@ final class AuthenticationViewModel {
 
         isLoading = true
         errorMessage = nil
+        isSigningIn = true
+
         do {
             try await authService.signIn(email: email, password: password)
 
-            // After sign in, wait for the auth listener to update state and fetch role
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            // Wait for auth listener to populate currentUserID
+            var waited = 0
+            while currentUserID == nil && waited < 20 {
+                try? await Task.sleep(nanoseconds: 100_000_000)
+                waited += 1
+            }
 
-            // Validate that the fetched role matches the selected role
             guard currentUserID != nil else {
                 errorMessage = "Gagal mengesahkan identiti pengguna."
                 isLoading = false
+                isSigningIn = false
+                authState = .unauthenticated
                 return
             }
 
-            // Re-fetch role to ensure we have latest
+            // Fetch role from Firestore
             await fetchRole()
 
-            if userRole != selectedRole {
-                // Role mismatch - sign out and show error
+            guard userRole == selectedRole else {
                 let correctRole = userRole == "student" ? "Peserta" : "Fasilitator"
                 errorMessage = "Akaun ini didaftarkan sebagai \(correctRole). Sila pilih \(correctRole) untuk log masuk."
                 try? authService.signOut()
                 clearAuthState()
-                authState = .unauthenticated
                 isLoading = false
+                isSigningIn = false
                 return
             }
 
+            // All validation passed - now set authenticated
             clearForm()
+            authState = .authenticated
         } catch {
             errorMessage = authService.mapFirebaseError(error)
             logger.error("Sign in failed: \(error.localizedDescription)")
+            authState = .unauthenticated
         }
         isLoading = false
+        isSigningIn = false
     }
 
     func register() async {
@@ -144,11 +165,20 @@ final class AuthenticationViewModel {
 
         isLoading = true
         errorMessage = nil
+        isSigningIn = true
+
         do {
             try await authService.register(fullName: fullName, email: email, password: password, role: selectedRole)
 
-            // Wait for Firestore profile to be created and auth listener to fire
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            // Wait for auth listener to populate currentUserID
+            var waited = 0
+            while currentUserID == nil && waited < 20 {
+                try? await Task.sleep(nanoseconds: 100_000_000)
+                waited += 1
+            }
+
+            // Wait a bit more for Firestore profile to propagate
+            try? await Task.sleep(nanoseconds: 500_000_000)
 
             // Verify role was saved
             if let uid = currentUserID {
@@ -159,11 +189,16 @@ final class AuthenticationViewModel {
             }
 
             clearForm()
+            // Set authenticated after successful registration
+            if currentUserID != nil {
+                authState = .authenticated
+            }
         } catch {
             errorMessage = authService.mapFirebaseError(error)
             logger.error("Registration failed: \(error.localizedDescription)")
         }
         isLoading = false
+        isSigningIn = false
     }
 
     func signOut() {

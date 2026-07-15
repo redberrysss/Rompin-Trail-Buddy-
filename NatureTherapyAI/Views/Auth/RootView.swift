@@ -30,21 +30,7 @@ struct RootView: View {
         case .loading:
             loadingView
         case .authenticated:
-            if authVM.userRole == role {
-                mainAppView(for: role)
-            } else {
-                loadingView
-                    .onAppear {
-                        // Wait for role to be fetched
-                        Task {
-                            try? await Task.sleep(nanoseconds: 2_000_000_000)
-                            if authVM.userRole != role {
-                                authVM.errorMessage = "Peranan tidak sepadan. Sila cuba lagi."
-                                authVM.signOut()
-                            }
-                        }
-                    }
-            }
+            mainAppView(for: role)
         case .unauthenticated:
             LoginView(authVM: $authVM)
         }
