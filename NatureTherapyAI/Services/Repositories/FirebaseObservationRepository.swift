@@ -34,7 +34,7 @@ final class FirebaseObservationRepository: ObservationRepository {
 
     private func ownerIdForObservation(_ obsId: String) async throws -> String {
         let groups = try await db.collectionGroup("observations")
-            .whereField(FieldPath.documentId(), isEqualTo: obsId)
+            .whereField(FieldPath.documentID(), isEqualTo: obsId)
             .getDocuments()
         guard let doc = groups.documents.first else { throw RepositoryError.notFound }
         return doc.reference.parent.parent!.documentID
@@ -72,7 +72,7 @@ final class FirebaseSensoryRepository: SensoryRepository {
 
     private func ownerIdForSensoryRecord(_ recordId: String) async throws -> String {
         let groups = try await db.collectionGroup("sensoryRecords")
-            .whereField(FieldPath.documentId(), isEqualTo: recordId)
+            .whereField(FieldPath.documentID(), isEqualTo: recordId)
             .getDocuments()
         guard let doc = groups.documents.first else { throw RepositoryError.notFound }
         return doc.reference.parent.parent!.documentID
@@ -110,7 +110,7 @@ final class FirebaseTreasureRepository: TreasureRepository {
 
     private func ownerIdForTreasureRecord(_ recordId: String) async throws -> String {
         let groups = try await db.collectionGroup("treasureRecords")
-            .whereField(FieldPath.documentId(), isEqualTo: recordId)
+            .whereField(FieldPath.documentID(), isEqualTo: recordId)
             .getDocuments()
         guard let doc = groups.documents.first else { throw RepositoryError.notFound }
         return doc.reference.parent.parent!.documentID
@@ -148,7 +148,7 @@ final class FirebaseArtworkRepository: ArtworkRepository {
 
     private func ownerIdForArtwork(_ artworkId: String) async throws -> String {
         let groups = try await db.collectionGroup("artworks")
-            .whereField(FieldPath.documentId(), isEqualTo: artworkId)
+            .whereField(FieldPath.documentID(), isEqualTo: artworkId)
             .getDocuments()
         guard let doc = groups.documents.first else { throw RepositoryError.notFound }
         return doc.reference.parent.parent!.documentID

@@ -35,7 +35,7 @@ final class FirebaseParticipantRepository: ParticipantRepository {
 
     private func ownerIdForParticipant(_ participantId: String) async throws -> String {
         let snapshot = try await db.collectionGroup("participants")
-            .whereField(FieldPath.documentId(), isEqualTo: participantId)
+            .whereField(FieldPath.documentID(), isEqualTo: participantId)
             .getDocuments()
         guard let doc = snapshot.documents.first else {
             throw RepositoryError.notFound

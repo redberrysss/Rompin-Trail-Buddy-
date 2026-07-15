@@ -19,6 +19,9 @@ final class AuthenticationViewModel {
     var currentUserName: String?
     var currentUserEmail: String?
 
+    var userRole: String = "participant"
+    var selectedRole: String = "participant"
+
     var email = ""
     var password = ""
     var confirmPassword = ""
@@ -39,16 +42,27 @@ final class AuthenticationViewModel {
                 self.currentUserName = user.displayName
                 self.currentUserEmail = user.email
                 self.authState = .authenticated
+                Task { await self.fetchRole() }
             } else {
                 self.currentUserID = nil
                 self.currentUserName = nil
                 self.currentUserEmail = nil
+                self.userRole = "participant"
                 self.authState = .unauthenticated
             }
         }
         #else
         self.authState = .unauthenticated
         #endif
+    }
+
+    func fetchRole() async {
+        guard let uid = currentUserID else { return }
+        do {
+            if let role = try await authService.fetchUserRole(uid: uid) {
+                userRole = role
+            }
+        } catch {}
     }
 
     func signIn() async {
@@ -97,7 +111,8 @@ final class AuthenticationViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await authService.register(fullName: fullName, email: email, password: password)
+            try await authService.register(fullName: fullName, email: email, password: password, role: selectedRole)
+            userRole = selectedRole
             clearForm()
         } catch {
             errorMessage = authService.mapFirebaseError(error)

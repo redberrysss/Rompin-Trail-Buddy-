@@ -29,7 +29,13 @@ struct RootView: View {
     }
 
     private var mainAppView: some View {
-        ParticipantSelectionView()
-            .environment(authVM)
+        Group {
+            if authVM.userRole == "facilitator" {
+                FacilitatorDashboardView()
+            } else {
+                ParticipantSelectionView()
+            }
+        }
+        .environment(authVM)
     }
 }

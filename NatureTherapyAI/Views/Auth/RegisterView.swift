@@ -28,6 +28,8 @@ struct RegisterView: View {
 
                         SecureFormField(label: "Pengesahan Kata Laluan", text: $authVM.confirmPassword, placeholder: "Taip semula kata laluan")
 
+                        rolePicker
+
                         if let error = authVM.errorMessage {
                             Text(error)
                                 .font(AppTheme.captionFont)
@@ -68,6 +70,38 @@ struct RegisterView: View {
                         .foregroundColor(AppTheme.forestGreen)
                 }
             }
+        }
+    }
+
+    private var rolePicker: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Jenis Akaun").font(AppTheme.captionFont).foregroundColor(AppTheme.darkGreen)
+            HStack(spacing: 12) {
+                roleButton(role: "participant", label: "Peserta", icon: "person.fill")
+                roleButton(role: "facilitator", label: "Fasilitator", icon: "person.2.fill")
+            }
+        }
+    }
+
+    private func roleButton(role: String, label: String, icon: String) -> some View {
+        Button {
+            authVM.selectedRole = role
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title3)
+                Text(label)
+                    .font(AppTheme.bodyFont)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(authVM.selectedRole == role ? AppTheme.forestGreen : AppTheme.cardBackground)
+            .foregroundColor(authVM.selectedRole == role ? .white : AppTheme.darkGreen)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(authVM.selectedRole == role ? AppTheme.forestGreen : Color.clear, lineWidth: 2)
+            )
         }
     }
 }

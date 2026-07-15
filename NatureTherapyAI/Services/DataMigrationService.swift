@@ -58,9 +58,9 @@ final class DataMigrationService {
                 "startedAt": Timestamp(date: session.startedAt),
                 "completedAt": session.completedAt.map { Timestamp(date: $0) } as Any,
                 "isCompleted": session.isCompleted,
-                "isSkipped": session.isSkipped,
+                "isSkipped": !session.isCompleted,
                 "progress": session.progress,
-                "createdAt": Timestamp(date: session.createdAt),
+                "createdAt": Timestamp(date: session.startedAt),
                 "updatedAt": Timestamp(date: Date())
             ]
             _ = try await db.collection("users").document(ownerId).collection("activitySessions").addDocument(data: data)
@@ -73,7 +73,7 @@ final class DataMigrationService {
             let data: [String: Any] = [
                 "ownerId": ownerId,
                 "participantId": participantId,
-                "sessionId": record.sessionId?.uuidString ?? "",
+                "sessionId": record.sessionID.uuidString,
                 "activityNumber": 1,
                 "category": record.category ?? "",
                 "objectName": record.objectName ?? "",
@@ -96,7 +96,7 @@ final class DataMigrationService {
             let data: [String: Any] = [
                 "ownerId": ownerId,
                 "participantId": participantId,
-                "sessionId": record.sessionId?.uuidString ?? "",
+                "sessionId": record.sessionID.uuidString,
                 "stationNumber": record.stationNumber,
                 "senseType": record.senseType,
                 "selectedValue": record.selectedValue,
@@ -115,7 +115,7 @@ final class DataMigrationService {
             let data: [String: Any] = [
                 "ownerId": ownerId,
                 "participantId": participantId,
-                "sessionId": record.sessionId?.uuidString ?? "",
+                "sessionId": record.sessionID.uuidString,
                 "itemName": record.itemName,
                 "isFound": record.isFound,
                 "isSkipped": record.isSkipped,
@@ -132,7 +132,7 @@ final class DataMigrationService {
             let data: [String: Any] = [
                 "ownerId": ownerId,
                 "participantId": participantId,
-                "sessionId": artwork.sessionId?.uuidString ?? "",
+                "sessionId": artwork.sessionID.uuidString,
                 "title": artwork.title,
                 "artworkType": artwork.artworkType,
                 "sourceImageIds": [],

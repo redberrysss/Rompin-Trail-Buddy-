@@ -45,6 +45,8 @@ SOURCE_FILES = [
     "Views/ProgressView.swift",
     "Views/TherapyView.swift",
     "Views/FacilitatorModePlaceholder.swift",
+    "Views/Facilitator/FacilitatorDashboardView.swift",
+    "Views/Facilitator/FacilitatorParticipantDetailView.swift",
     "Views/Activity1NatureWalkView.swift",
     "Views/Activity2SensoryView.swift",
     "Views/Activity3TreasureHuntView.swift",

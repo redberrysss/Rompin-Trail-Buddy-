@@ -34,7 +34,7 @@ final class FirebaseSessionRepository: SessionRepository {
 
     private func ownerIdForSession(_ sessionId: String) async throws -> String {
         let groups = try await db.collectionGroup("activitySessions")
-            .whereField(FieldPath.documentId(), isEqualTo: sessionId)
+            .whereField(FieldPath.documentID(), isEqualTo: sessionId)
             .getDocuments()
         guard let doc = groups.documents.first else { throw RepositoryError.notFound }
         return doc.reference.parent.parent!.documentID

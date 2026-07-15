@@ -19,7 +19,7 @@ final class AuthenticationService {
         return result.user
     }
 
-    func register(fullName: String, email: String, password: String) async throws -> User {
+    func register(fullName: String, email: String, password: String, role: String = "participant") async throws -> User {
         let result = try await auth.createUser(withEmail: email, password: password)
         let user = result.user
 
@@ -30,13 +30,18 @@ final class AuthenticationService {
         let userDoc: [String: Any] = [
             "fullName": fullName,
             "email": email,
-            "role": "participant",
+            "role": role,
             "createdAt": FieldValue.serverTimestamp(),
             "updatedAt": FieldValue.serverTimestamp()
         ]
         try await db.collection("users").document(user.uid).setData(userDoc)
 
         return user
+    }
+
+    func fetchUserRole(uid: String) async throws -> String? {
+        let doc = try await db.collection("users").document(uid).getDocument()
+        return doc.data()?["role"] as? String
     }
 
     func signOut() throws { try auth.signOut() }
@@ -93,9 +98,11 @@ final class AuthenticationService {
         throw AuthError.notConfigured
     }
 
-    func register(fullName: String, email: String, password: String) async throws -> Never {
+    func register(fullName: String, email: String, password: String, role: String = "participant") async throws -> Never {
         throw AuthError.notConfigured
     }
+
+    func fetchUserRole(uid: String) async throws -> String? { return nil }
 
     func signOut() throws {
         throw AuthError.notConfigured
