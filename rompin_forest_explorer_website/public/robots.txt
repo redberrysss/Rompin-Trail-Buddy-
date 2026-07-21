@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rompinforestexplorer.com/sitemap.xml
