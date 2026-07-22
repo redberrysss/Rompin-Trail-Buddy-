@@ -11,13 +11,108 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isFacilitator() {
+      let role = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      return isSignedIn() && role in [
+        'facilitator', 'fasilitator', 'admin', 'teacher', 'guru',
+        'therapist', 'terapis'
+      ];
+    }
+
+    function isGroupMember(groupCode) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/groups/$(groupCode)/members/$(request.auth.uid));
+    }
+
+    function isGroupFacilitator(groupCode) {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/groups/$(groupCode)).data.facilitatorId
+          == request.auth.uid;
+    }
+
+    function isFacilitatorForUser(userId) {
+      let profile = get(/databases/$(database)/documents/users/$(userId)).data;
+      return isSignedIn()
+        && profile.groupCode is string
+        && get(/databases/$(database)/documents/groups/$(profile.groupCode)).data.facilitatorId
+          == request.auth.uid;
+    }
+
     match /users/{userId} {
       allow create: if isOwner(userId);
-      allow read, update, delete: if isOwner(userId);
+      allow read: if isOwner(userId) || isFacilitator();
+      allow update, delete: if isOwner(userId);
 
       match /{document=**} {
-        allow read, write: if isOwner(userId);
+        allow read: if isOwner(userId) || isFacilitator();
+        allow write: if isOwner(userId);
       }
+    }
+
+    match /groups/{groupCode} {
+      // A signed-in user may resolve an exact invitation code. Student data in
+      // the subcollections remains restricted to members of that group.
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isGroupFacilitator(groupCode);
+
+      match /members/{memberId} {
+        allow read: if isGroupMember(groupCode)
+          || (isSignedIn() && resource.data.userId == request.auth.uid);
+        allow create: if isOwner(memberId)
+          && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isOwner(memberId)
+          || isGroupFacilitator(groupCode);
+      }
+
+      match /participants/{participantId} {
+        allow read: if isGroupMember(groupCode);
+        allow create, update: if isGroupMember(groupCode)
+          && (isOwner(participantId) || isGroupFacilitator(groupCode));
+        allow delete: if isGroupFacilitator(groupCode);
+      }
+
+      match /{recordCollection}/{recordId} {
+        allow read: if isGroupMember(groupCode);
+        allow create, update: if isGroupMember(groupCode)
+          && (request.resource.data.participantId == request.auth.uid
+            || request.resource.data.userId == request.auth.uid
+            || request.resource.data.ownerId == request.auth.uid);
+        allow delete: if isGroupFacilitator(groupCode)
+          || (isGroupMember(groupCode)
+            && (resource.data.participantId == request.auth.uid
+              || resource.data.userId == request.auth.uid
+              || resource.data.ownerId == request.auth.uid));
+      }
+    }
+
+    // Read-only compatibility for records written by older Flutter builds.
+    // Each query must include where('participantId', isEqualTo: auth.uid),
+    // so users can never list another participant's legacy discoveries.
+    match /{legacyCollection}/{recordId} {
+      allow read: if isFacilitator()
+        || (isSignedIn()
+        && legacyCollection in [
+          'participants',
+          'activity_sessions',
+          'activitySessions',
+          'observations',
+          'observation_records',
+          'sensory_records',
+          'treasure_records',
+          'artworks',
+          'artwork_records',
+          'discoveries',
+          'student_discoveries'
+        ]
+        && (resource.data.participantId == request.auth.uid
+          || resource.data.userId == request.auth.uid
+          || resource.data.ownerId == request.auth.uid));
+      allow delete: if isSignedIn()
+        && (resource.data.participantId == request.auth.uid
+          || resource.data.userId == request.auth.uid
+          || resource.data.ownerId == request.auth.uid);
+      allow create, update: if false;
     }
   }
 }

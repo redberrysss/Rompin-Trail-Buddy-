@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "107247712841",
+    "project_id": "rompin-trail-buddy",
+    "storage_bucket": "rompin-trail-buddy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:107247712841:android:904b70fe388a2a415d1d98",
+        "android_client_info": {
+          "package_name": "com.rompinforest.explorer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6_6zLls0H49KdoCdL5ev4UUstPjeNQgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

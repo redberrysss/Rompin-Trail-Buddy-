@@ -11,6 +11,16 @@ service firebase.storage {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isFacilitator() {
+      let role = firestore.get(
+        /databases/(default)/documents/users/$(request.auth.uid)
+      ).data.role;
+      return isSignedIn() && role in [
+        'facilitator', 'fasilitator', 'admin', 'teacher', 'guru',
+        'therapist', 'terapis'
+      ];
+    }
+
     function isValidImage() {
       return request.resource.size < 10 * 1024 * 1024
         && request.resource.contentType.matches('image/.*');
@@ -22,9 +32,10 @@ service firebase.storage {
     }
 
     match /users/{userId}/{allPaths=**} {
-      allow read: if isOwner(userId);
-      allow write: if isOwner(userId)
+      allow read: if isOwner(userId) || isFacilitator();
+      allow create, update: if isOwner(userId)
         && (isValidImage() || isValidAudio());
+      allow delete: if isOwner(userId);
     }
   }
 }
